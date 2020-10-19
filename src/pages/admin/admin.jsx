@@ -35,6 +35,7 @@ import baseDetail from '../detail/base-detail'
 import seniorDetail from '../detail/senior-detail'
 import Administrator from '../webdisk/administrator'
 import Log from '../webdisk/log'
+import Myshare from '../webdisk/myshare'
 import User from '../webdisk/user'
 import './admin.less'
 
@@ -99,6 +100,7 @@ export default class Admin extends Component {
                                 <Route path="/senior-detail" component={seniorDetail}></Route>
                                 <Route path="/administrator" component={Administrator}></Route>
                                 <Route path="/log" component={Log}></Route>
+                                <Route path="/myshare" component={Myshare}></Route>
                                 <Route path="/user" component={User}></Route>
                                 <Route path="/base-form" component={BaseForm}></Route>
                                 <Route path="/modal-form" component={ModalForm}></Route>

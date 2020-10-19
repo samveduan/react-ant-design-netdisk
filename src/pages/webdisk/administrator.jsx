@@ -80,13 +80,13 @@ export default class administrator extends Component {
 
     onDeleteAdministrators = () => {
         let len = this.state.selectedRowKeys.length;
-        
-        if(len === 0){
+
+        if (len === 0) {
             notification['error']({
                 message: '错误提示',
                 description: '请选择要删除的管理员！',
             })
-        }else{
+        } else {
             console.log(this.state.selectedRowKeys);
         }
     }
@@ -278,17 +278,17 @@ export default class administrator extends Component {
 
     editModalHandleOk = () => {
         this.editModalForm.current.validateFields()
-        .then(values => {
-            this.editModalForm.current.resetFields();
-            this.setState({
-                editModalVisible: false
+            .then(values => {
+                this.editModalForm.current.resetFields();
+                this.setState({
+                    editModalVisible: false
+                })
+                console.log("表单元素值：");
+                console.log(values);
             })
-            console.log("表单元素值：");
-            console.log(values);
-        })
-        .catch(error => {
-            console.log(error);
-        })
+            .catch(error => {
+                console.log(error);
+            })
     }
 
     editModalHandCancel = () => {
@@ -366,7 +366,6 @@ export default class administrator extends Component {
                                 onChange={this.onChange}
                                 onShowSizeChange={this.onShowSizeChange}
                             />
-
                         </Col>
                     </Row>
                 </Card>
@@ -637,7 +636,6 @@ export default class administrator extends Component {
                             <Form.Item
                                 style={{ display: 'inline-block', width: 'calc(25% - 8px)' }}
                             >
-
                             </Form.Item>
                         </Form.Item>
                         <Form.Item

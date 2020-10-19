@@ -210,6 +210,11 @@ const MenuList = [
                 icon: 'line-chart'
             },
             {
+                title: '收到的共享',
+                key: '/myshare',
+                icon: 'line-chart'
+            },
+            {
                 title: '个人中心',
                 key: '/user',
                 icon: 'line-chart'
