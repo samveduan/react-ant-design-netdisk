@@ -1,4 +1,4 @@
-import { SnippetsFilled, PieChartFilled, PieChartOutlined, ProfileOutlined, CheckSquareOutlined, BarChartOutlined, WhatsAppOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { SnippetsFilled, PieChartFilled, PieChartOutlined, ProfileOutlined, FileWordOutlined, FileTextOutlined , BarChartOutlined, WhatsAppOutlined, ExclamationCircleOutlined, IeOutlined, SketchOutlined } from '@ant-design/icons';
 
 const MenuList = [
     {
@@ -121,7 +121,7 @@ const MenuList = [
     {
         title: '表单页',
         key: '/form',
-        icon: ExclamationCircleOutlined,
+        icon: FileTextOutlined,
         children: [
             {
                 title: '基础表单',
@@ -148,7 +148,7 @@ const MenuList = [
     {
         title: '列表页',
         key: '/list',
-        icon: ExclamationCircleOutlined,
+        icon: ProfileOutlined,
         children: [
             {
                 title: '搜索列表',
@@ -180,7 +180,7 @@ const MenuList = [
     {
         title: '详情页',
         key: '/detail',
-        icon: ProfileOutlined,
+        icon: FileWordOutlined,
         children: [
             {
                 title: '基础详情页',
@@ -197,7 +197,7 @@ const MenuList = [
     {
         title: '网盘',
         key: '/webdisk',
-        icon: CheckSquareOutlined,
+        icon: IeOutlined,
         children: [
             {
                 title: '管理员管理',
@@ -215,9 +215,26 @@ const MenuList = [
                 icon: 'line-chart'
             },
             {
-                title: '个人中心',
-                key: '/user',
+                title: 'USBKEY',
+                key: '/usbkey',
                 icon: 'line-chart'
+            }
+        ]
+    },
+    {
+        title: '加固',
+        key: '/firmstor',
+        icon: SketchOutlined,
+        children: [
+            {
+                title: '基本信息',
+                key: '/baseinfo',
+                icon: 'bar-chart'
+            },
+            {
+                title: '保险箱文件恢复',
+                key: '/file-recovery',
+                icon: 'bar-chart'
             }
         ]
     }

@@ -29,8 +29,9 @@ export default class Home extends Component {
             ['2019-10-17', 300],
             ['2019-10-18', 200]
         ],
+        selectedRowKeys: [], // 表格选择项Keys
+        selectedRows: [], // 表格选择项Rows
         tableData: [],
-        selectedRowKeys: [], // Check here to configure the default column
         total: 0, // for Pagination
         columns: [
             {
@@ -109,10 +110,20 @@ export default class Home extends Component {
         };
     }
 
+    onTableSelectChange = (selectedRowKeys, selectedRows) => {
+        console.log('selectedRowKeys changed: ', selectedRowKeys);
+        console.log('selectedRows changed: ', selectedRows);
+        this.setState({ selectedRowKeys, selectedRows });
+    };
+
     onSelectChange = selectedRowKeys => {
         console.log('selectedRowKeys changed: ', selectedRowKeys);
         this.setState({ selectedRowKeys });
     };
+
+    /**
+     * 表格
+     */
 
     // 获取表格数据
     getData(pageNumber, pageSize) {
@@ -138,8 +149,13 @@ export default class Home extends Component {
     }
 
     onChange = (pageNumber, pageSize) => {
+        this.pageNum = pageNumber;
         this.getData(pageNumber, pageSize);
     };
+
+    /**
+     * 添加modal
+     */
 
     // for modal
     showAddModal = () => {
@@ -171,6 +187,10 @@ export default class Home extends Component {
     // 表单相关
     addModalFormRef = React.createRef(); // 定义一个表单
 
+    /**
+     * 钩子函数
+     */
+
     componentDidMount() {
         this.getData(1, 5);
 
@@ -201,11 +221,10 @@ export default class Home extends Component {
     }
 
     render() {
-        const { selectedRowKeys } = this.state;
-
+        // 控制表格选择
         const rowSelection = {
-            selectedRowKeys,
-            onChange: this.onSelectChange
+            selectedRowKeys: this.state.selectedRowKeys,
+            onChange: this.onTableSelectChange
         };
 
         return (<>
@@ -218,25 +237,33 @@ export default class Home extends Component {
             <div style={{ height: 15 }}></div>
 
             <Card title="Default size card" extra={<Button type="primary" ghost size="small" icon={<PlusOutlined />} onClick={this.showAddModal}>添加</Button>} style={{ width: '100%' }}>
-                <Table columns={this.state.columns} dataSource={this.state.tableData} rowSelection={rowSelection} pagination={false} bordered
+                <Table
                     onRow={record => {
                         return {
-                            onClick: event => { console.log(record) },
-                            onDoubleClick: event => { console.log(event) }
-                        }
+                            onClick: event => { console.log(record) }, // 点击行
+                            onDoubleClick: event => { },
+                            onContextMenu: event => { },
+                            onMouseEnter: event => { }, // 鼠标移入行
+                            onMouseLeave: event => { },
+                        };
                     }}
+                    rowSelection={rowSelection}
+                    columns={this.state.columns}
+                    dataSource={this.state.tableData}
+                    pagination={{
+                        current: this.pageNum,
+                        total: this.state.total,
+                        pageSizeOptions: [5, 10, 20, 50, 100],
+                        defaultPageSize: 5,
+                        showSizeChanger: true,
+                        showQuickJumper: true,
+                        showTotal: (total, range) => `共 ${total} 条`,
+                        onChange: this.onChange
+                    }}
+                    bordered
                 >
                 </Table>
-                <div style={{ height: 15 }}></div>
-                <Pagination
-                    pageSizeOptions={[5, 10, 20, 50, 100]}
-                    defaultPageSize={5}
-                    total={this.state.total}
-                    showSizeChanger
-                    showQuickJumper
-                    showTotal={total => `共 ${total} 条`}
-                    onChange={this.onChange}
-                />
+
                 <Modal
                     title="创建"
                     visible={this.state.addModalVisible}

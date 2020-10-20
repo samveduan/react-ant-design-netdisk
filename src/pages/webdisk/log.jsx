@@ -16,6 +16,8 @@ const createModalFormLayout = {
 
 export default class log extends Component {
     state = {
+        selectedRowKeys: [], // 表格选择项Keys
+        selectedRows: [], // 表格选择项Rows
         tableColumns: [],
         tableData: [],
         total: 0,
@@ -31,7 +33,9 @@ export default class log extends Component {
         });
     }
 
-    // 表格
+    /**
+     * 表格
+     */
     getTableColumns = () => {
         return [
             {
@@ -81,17 +85,21 @@ export default class log extends Component {
         });
     }
 
+    onTableSelectChange = (selectedRowKeys, selectedRows) => {
+        console.log('selectedRowKeys changed: ', selectedRowKeys);
+        console.log('selectedRows changed: ', selectedRows);
+        this.setState({ selectedRowKeys, selectedRows });
+    };
+
     onChange = (pageNumber, pageSize) => {
-        console.log("onChange");
+        this.pageNum = pageNumber;
         let thisCurrent = Number(pageNumber) === 0 ? 1 : pageNumber;
         this.getTableData(thisCurrent, pageSize);
     }
 
-    onShowSizeChange = (current, size) => {
-
-    }
-
-    // 创建modal
+    /**
+     * 创建modal
+     */
     createModalHandCancel = () => {
         this.setState({
             createModalVisible: false
@@ -115,6 +123,9 @@ export default class log extends Component {
         console.log(date, dateString);
     }
 
+    /**
+     * 钩子函数
+     */
     componentWillMount() {
         this.tableColumns = this.getTableColumns();
     }
@@ -124,6 +135,12 @@ export default class log extends Component {
     }
 
     render() {
+        // 控制表格选择
+        const rowSelection = {
+            selectedRowKeys: this.state.selectedRowKeys,
+            onChange: this.onTableSelectChange
+        };
+
         return (
             <div>
                 <Card>
@@ -133,7 +150,7 @@ export default class log extends Component {
                                 <Col span={16}>
                                     <Space size={15}>
                                         <Button type="primary" ghost icon={<FileAddOutlined />} onClick={() => this.onCreateAdministrator()}>日志检索</Button>
-                                        <Button type="primary" ghost icon={<AppstoreOutlined  />}>全部</Button>
+                                        <Button type="primary" ghost icon={<AppstoreOutlined />}>全部</Button>
                                     </Space>
                                 </Col>
                                 <Col span={8}>
@@ -143,24 +160,31 @@ export default class log extends Component {
 
                             <Spin spinning={this.state.tableLoading} tip="加载中......" size="large">
                                 <Table
+                                    onRow={record => {
+                                        return {
+                                            onClick: event => { console.log(record) }, // 点击行
+                                            onDoubleClick: event => { },
+                                            onContextMenu: event => { },
+                                            onMouseEnter: event => { }, // 鼠标移入行
+                                            onMouseLeave: event => { },
+                                        };
+                                    }}
+                                    rowSelection={rowSelection}
                                     columns={this.tableColumns}
                                     dataSource={this.state.tableData}
-                                    pagination={false}
+                                    pagination={{
+                                        current: this.pageNum,
+                                        total: this.state.total,
+                                        pageSizeOptions: [5, 10, 20, 50, 100],
+                                        defaultPageSize: 5,
+                                        showSizeChanger: true,
+                                        showQuickJumper: true,
+                                        showTotal: (total, range) => `共 ${total} 条`,
+                                        onChange: this.onChange
+                                    }}
                                     bordered
-                                    style={{ marginBottom: 15 }}
                                 />
                             </Spin>
-
-                            <Pagination
-                                pageSizeOptions={[5, 10, 20, 50, 100]}
-                                defaultPageSize={5}
-                                total={this.state.total}
-                                showSizeChanger
-                                showQuickJumper
-                                showTotal={total => `共 ${total} 条`}
-                                onChange={this.onChange}
-                                onShowSizeChange={this.onShowSizeChange}
-                            />
 
                         </Col>
                     </Row>
@@ -186,7 +210,7 @@ export default class log extends Component {
                             </Col>
 
                             <Col span={12}>
-                                <Form.Item style={{ textAlign: 'right'}} labelCol={{span: 0}} wrapperCol={{span: 24}}>
+                                <Form.Item style={{ textAlign: 'right' }} labelCol={{ span: 0 }} wrapperCol={{ span: 24 }}>
                                     <Checkbox onChange={e => this.onIsShowAdvance(e)} checked={this.state.isShowAdvance}>高级</Checkbox>
                                 </Form.Item>
                             </Col>

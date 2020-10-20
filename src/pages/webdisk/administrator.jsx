@@ -47,35 +47,21 @@ export default class administrator extends Component {
         });
     }
 
-    onEditAdministrator = () => {
-        let len = this.state.selectedRows.length;
-        if (len === 0) {
-            notification["error"]({
-                message: '错误提示',
-                description:
-                    '请选择一个管理员！',
-            });
-        } else if (len > 1) {
-            notification["error"]({
-                message: '错误提示',
-                description: '一次只能编辑一个管理员！',
-            });
-        } else {
-            this.setState({
-                editModalVisible: true
-            });
+    onEditAdministrator = (text, record, index) => {
+        this.setState({
+            editModalVisible: true
+        });
 
-            this.setState({
-                editModalFormInitValues: {
-                    editModalFormUserName: 'admin01',
-                    editModalFormAccountName: 'admin01',
-                    editModalFormUserSpace: 1,
-                    editModalFormServer: 'mmj',
-                    editModalFormIsShare: 'no',
-                    editModalFormDescribe: this.state.selectedRows[0].content
-                }
-            })
-        }
+        this.setState({
+            editModalFormInitValues: {
+                editModalFormUserName: 'admin01',
+                editModalFormAccountName: 'admin01',
+                editModalFormUserSpace: 1,
+                editModalFormServer: 'mmj',
+                editModalFormIsShare: 'no',
+                editModalFormDescribe: record.content
+            }
+        })
     }
 
     onDeleteAdministrators = () => {
@@ -177,7 +163,7 @@ export default class administrator extends Component {
             {
                 title: 'ID',
                 dataIndex: 'id',
-                width: 30,
+                width: 60,
             },
             {
                 title: '标题',
@@ -188,6 +174,14 @@ export default class administrator extends Component {
                 title: '内容',
                 dataIndex: 'content'
             },
+            {
+                title: '编辑',
+                dataIndex: 'edit',
+                width: 80,
+                render: (text, record, index) => {
+                    return (<Button type="primary" ghost icon={<EditOutlined />} size="small" onClick={() => this.onEditAdministrator(text, record, index)} style={{ border: 0 }}></Button>)
+                }
+            }
         ]
     }
 
@@ -229,7 +223,7 @@ export default class administrator extends Component {
 
     //  分页用
     onChange = (pageNumber, pageSize) => {
-        console.log("onChange");
+        this.pageNum = pageNumber;
         let thisCurrent = Number(pageNumber) === 0 ? 1 : pageNumber;
         this.getTableData(thisCurrent, pageSize);
     }
@@ -336,7 +330,6 @@ export default class administrator extends Component {
                                 <Col span={16}>
                                     <Space size={15}>
                                         <Button type="primary" ghost icon={<FileAddOutlined />} onClick={() => this.onCreateAdministrator()}>创建</Button>
-                                        <Button type="primary" ghost icon={<EditOutlined />} onClick={() => this.onEditAdministrator()}>编辑</Button>
                                         <Button type="primary" ghost icon={<DeleteOutlined />} onClick={() => this.onDeleteAdministrators()}>删除</Button>
                                     </Space>
                                 </Col>
@@ -347,25 +340,32 @@ export default class administrator extends Component {
 
                             <Spin spinning={this.state.tableLoading} tip="加载中......" size="large">
                                 <Table
+                                    onRow={record => {
+                                        return {
+                                            onClick: event => { console.log(record) }, // 点击行
+                                            onDoubleClick: event => { },
+                                            onContextMenu: event => { },
+                                            onMouseEnter: event => { }, // 鼠标移入行
+                                            onMouseLeave: event => { },
+                                        };
+                                    }}
                                     rowSelection={rowSelection}
                                     columns={this.tableColumns}
                                     dataSource={this.state.tableData}
-                                    pagination={false}
+                                    pagination={{
+                                        current: this.pageNum,
+                                        total: this.state.total,
+                                        pageSizeOptions: [5, 10, 20, 50, 100],
+                                        defaultPageSize: 5,
+                                        showSizeChanger: true,
+                                        showQuickJumper: true,
+                                        showTotal: (total, range) => `共 ${total} 条`,
+                                        onChange: this.onChange
+                                    }}
                                     bordered
                                     style={{ marginBottom: 15 }}
                                 />
                             </Spin>
-
-                            <Pagination
-                                pageSizeOptions={[5, 10, 20, 50, 100]}
-                                defaultPageSize={5}
-                                total={this.state.total}
-                                showSizeChanger
-                                showQuickJumper
-                                showTotal={total => `共 ${total} 条`}
-                                onChange={this.onChange}
-                                onShowSizeChange={this.onShowSizeChange}
-                            />
                         </Col>
                     </Row>
                 </Card>

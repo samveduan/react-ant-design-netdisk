@@ -36,7 +36,9 @@ import seniorDetail from '../detail/senior-detail'
 import Administrator from '../webdisk/administrator'
 import Log from '../webdisk/log'
 import Myshare from '../webdisk/myshare'
-import User from '../webdisk/user'
+import Usbkey from '../webdisk/usbkey'
+import Baseinfo from '../firmstor/baseinfo'
+import FileRecovery from '../firmstor/file-recovery'
 import './admin.less'
 
 const { Content, Sider } = Layout;
@@ -101,7 +103,9 @@ export default class Admin extends Component {
                                 <Route path="/administrator" component={Administrator}></Route>
                                 <Route path="/log" component={Log}></Route>
                                 <Route path="/myshare" component={Myshare}></Route>
-                                <Route path="/user" component={User}></Route>
+                                <Route path="/usbkey" component={Usbkey}></Route>
+                                <Route path="/baseinfo" component={Baseinfo}></Route>
+                                <Route path="/file-recovery" component={FileRecovery}></Route>
                                 <Route path="/base-form" component={BaseForm}></Route>
                                 <Route path="/modal-form" component={ModalForm}></Route>
                                 <Route path="/step-form" component={StepForm}></Route>

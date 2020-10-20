@@ -5,10 +5,15 @@ import axios from 'axios'
 export default class TableCom extends React.Component {
     state = {
         tableData: [],
-        selectedRowKeys: [], // Check here to configure the default column
+        selectedRowKeys: [], // 表格选择项Keys
+        selectedRows: [], // 表格选择项Rows
         total: 0, // for Pagination,
         tableLoading: true
     };
+
+    /**
+     * 表格
+     */
 
     getTableColumns = () => {
         return [
@@ -29,10 +34,6 @@ export default class TableCom extends React.Component {
         ]
     }
 
-    componentWillMount() {
-        this.TableColumns = this.getTableColumns();
-    }
-
     handleDeleteArticle() {
         if (this.state.selectedRowKeys.length === 0) {
             notification['error']({
@@ -48,11 +49,6 @@ export default class TableCom extends React.Component {
             });
         }
     }
-
-    onSelectChange = selectedRowKeys => {
-        console.log('selectedRowKeys changed: ', selectedRowKeys);
-        this.setState({ selectedRowKeys });
-    };
 
     // 获取表格数据
     getData(pageNumber, pageSize) {
@@ -84,20 +80,33 @@ export default class TableCom extends React.Component {
         });
     }
 
+    onTableSelectChange = (selectedRowKeys, selectedRows) => {
+        console.log('selectedRowKeys changed: ', selectedRowKeys);
+        console.log('selectedRows changed: ', selectedRows);
+        this.setState({ selectedRowKeys, selectedRows });
+    };
+
     onChange = (pageNumber, pageSize) => {
+        this.pageNum = pageNumber;
         this.getData(pageNumber, pageSize);
     };
+
+    /**
+     * 钩子函数
+     */
+
+    componentWillMount() {
+        this.TableColumns = this.getTableColumns();
+    }
 
     componentDidMount() {
         this.getData(1, 5);
     }
 
     render() {
-        const { selectedRowKeys } = this.state;
-
         const rowSelection = {
-            selectedRowKeys,
-            onChange: this.onSelectChange
+            selectedRowKeys: this.state.selectedRowKeys,
+            onChange: this.onTableSelectChange
         };
 
         return (<>
@@ -107,26 +116,33 @@ export default class TableCom extends React.Component {
             <Row>
                 <Col span={24}>
                     <Spin spinning={this.state.tableLoading} tip="加载中..." size="large">
-                        <Table columns={this.TableColumns} dataSource={this.state.tableData} rowSelection={rowSelection} pagination={false} bordered
+                        <Table
                             onRow={record => {
                                 return {
-                                    onClick: event => { console.log(record) },
-                                    onDoubleClick: event => { console.log(event) }
-                                }
+                                    onClick: event => { console.log(record) }, // 点击行
+                                    onDoubleClick: event => { },
+                                    onContextMenu: event => { },
+                                    onMouseEnter: event => { }, // 鼠标移入行
+                                    onMouseLeave: event => { },
+                                };
                             }}
+                            rowSelection={rowSelection}
+                            columns={this.TableColumns}
+                            dataSource={this.state.tableData}
+                            pagination={{
+                                current: this.pageNum,
+                                total: this.state.total,
+                                pageSizeOptions: [5, 10, 20, 50, 100],
+                                defaultPageSize: 5,
+                                showSizeChanger: true,
+                                showQuickJumper: true,
+                                showTotal: (total, range) => `共 ${total} 条`,
+                                onChange: this.onChange
+                            }}
+                            bordered
                         >
                         </Table>
                     </Spin>
-                    <div style={{ height: 15 }}></div>
-                    <Pagination
-                        pageSizeOptions={[5, 10, 20, 50, 100]}
-                        defaultPageSize={5}
-                        total={this.state.total}
-                        showSizeChanger
-                        showQuickJumper
-                        showTotal={total => `共 ${total} 条`}
-                        onChange={this.onChange}
-                    />
                 </Col>
             </Row>
         </>);

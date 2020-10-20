@@ -13,10 +13,14 @@ export default class queryTable extends Component {
         tableLoading: true,
         tableData: [],
         total: 0,
+        selectedRowKeys: [], // 选择的行的key
+        selectedRows: [], // 选择的行的数据
         createRuleModal_Visible: false
     }
 
-    // 搜索表单
+    /**
+     * 搜索表单
+     */
     formRef = React.createRef()
 
     formRef_onFinish = () => {
@@ -33,7 +37,9 @@ export default class queryTable extends Component {
         this.formRef.current.resetFields();
     }
 
-    // 表格
+    /**
+     * 表格
+     */
     getTableColumns = () => {
         return [
             {
@@ -80,11 +86,20 @@ export default class queryTable extends Component {
         });
     }
 
+    onTableSelectChange = (selectedRowKeys, selectedRows) => {
+        console.log('selectedRowKeys changed: ', selectedRowKeys);
+        console.log('selectedRows changed: ', selectedRows);
+        this.setState({ selectedRowKeys, selectedRows });
+    };
+
     onChange = (pageNumber, pageSize) => {
+        this.pageNum = pageNumber;
         this.getData(pageNumber, pageSize);
     }
 
-    // 新建规则modal
+    /**
+     * 新建规则modal
+     */
     createRuleForm = React.createRef()
 
     createRuleForm_HandleOpen = () => {
@@ -114,6 +129,9 @@ export default class queryTable extends Component {
         })
     }
 
+    /**
+     * 钩子函数
+     */
     componentWillMount() {
         this.TableColumns = this.getTableColumns();
     }
@@ -123,6 +141,12 @@ export default class queryTable extends Component {
     }
 
     render() {
+        // 控制表格选择
+        const rowSelection = {
+            selectedRowKeys: this.state.selectedRowKeys,
+            onChange: this.onTableSelectChange
+        };
+
         const extraButton = (<span>
             <Button type='primary' icon={<PlusOutlined />} onClick={() => this.createRuleForm_HandleOpen()}>新建</Button>
             <Tooltip title="刷新"><Button icon={<RedoOutlined />} style={{ border: 0 }}></Button></Tooltip>
@@ -192,9 +216,28 @@ export default class queryTable extends Component {
                 <Card title="查询表格" extra={extraButton} style={{ width: '100%' }}>
                     <Spin spinning={this.state.tableLoading} tip='加载中...' size='large'>
                         <Table
+                            onRow={record => {
+                                return {
+                                    onClick: event => { console.log(record) }, // 点击行
+                                    onDoubleClick: event => { },
+                                    onContextMenu: event => { },
+                                    onMouseEnter: event => { }, // 鼠标移入行
+                                    onMouseLeave: event => { },
+                                };
+                            }}
+                            rowSelection={rowSelection}
                             columns={this.TableColumns}
                             dataSource={this.state.tableData}
-                            pagination={false}
+                            pagination={{
+                                current: this.pageNum,
+                                total: this.state.total,
+                                pageSizeOptions: [5, 10, 20, 50, 100],
+                                defaultPageSize: 5,
+                                showSizeChanger: true,
+                                showQuickJumper: true,
+                                showTotal: (total, range) => `共 ${total} 条`,
+                                onChange: this.onChange
+                            }}
                             bordered
                             onRow={record => {
                                 return {
@@ -205,16 +248,6 @@ export default class queryTable extends Component {
                         >
                         </Table>
                     </Spin>
-                    <div style={{ height: 15 }}></div>
-                    <Pagination
-                        pageSizeOptions={[5, 10, 20, 50, 100]}
-                        defaultPageSize={5}
-                        total={this.state.total}
-                        showSizeChanger
-                        showQuickJumper
-                        showTotal={total => `共 ${total} 条`}
-                        onChange={this.onChange}
-                    />
                 </Card>
 
                 <Modal

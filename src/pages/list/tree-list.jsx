@@ -6,12 +6,16 @@ const { DirectoryTree } = Tree;
 
 export default class TreeList extends Component {
     state = {
+        selectedRowKeys: [], // 表格选择项Keys
+        selectedRows: [], // 表格选择项Rows
         tableLoading: false,
         tableData: [],
         total: 0
     }
 
-    // 树
+    /**
+     * 树
+     */
     getTreeData = () => {
         return [
             {
@@ -87,7 +91,9 @@ export default class TreeList extends Component {
         console.log('onCheck', checkedKeys, info);
     };
 
-    // 表格
+    /**
+     * 表格
+     */
     getTableColumns = () => {
         return [
             {
@@ -135,10 +141,20 @@ export default class TreeList extends Component {
         });
     }
 
+    onTableSelectChange = (selectedRowKeys, selectedRows) => {
+        console.log('selectedRowKeys changed: ', selectedRowKeys);
+        console.log('selectedRows changed: ', selectedRows);
+        this.setState({ selectedRowKeys, selectedRows });
+    };
+
     onChange = (pageNumber, pageSize) => {
+        this.pageNum = pageNumber;
         this.getData(pageNumber, pageSize);
     }
 
+    /**
+     * 钩子函数
+     */
     componentWillMount() {
         this.TableColumns = this.getTableColumns();
         this.treeData = this.getTreeData();
@@ -149,6 +165,12 @@ export default class TreeList extends Component {
     }
 
     render() {
+        // 控制表格选择
+        const rowSelection = {
+            selectedRowKeys: this.state.selectedRowKeys,
+            onChange: this.onTableSelectChange
+        };
+
         return (
             <div>
                 <Card style={{ width: '100%' }}>
@@ -177,19 +199,32 @@ export default class TreeList extends Component {
                                 </Col>
                             </Row>
                             <Spin spinning={this.state.tableLoading} tip='加载中...' size='large'>
-                                <Table columns={this.TableColumns} dataSource={this.state.tableData} pagination={false} bordered>
+                                <Table
+                                    onRow={record => {
+                                        return {
+                                            onClick: event => { console.log(record) }, // 点击行
+                                            onDoubleClick: event => { },
+                                            onContextMenu: event => { },
+                                            onMouseEnter: event => { }, // 鼠标移入行
+                                            onMouseLeave: event => { },
+                                        };
+                                    }}
+                                    rowSelection={rowSelection}
+                                    columns={this.TableColumns}
+                                    dataSource={this.state.tableData}
+                                    pagination={{
+                                        current: this.pageNum,
+                                        total: this.state.total,
+                                        pageSizeOptions: [5, 10, 20, 50, 100],
+                                        defaultPageSize: 5,
+                                        showSizeChanger: true,
+                                        showQuickJumper: true,
+                                        showTotal: (total, range) => `共 ${total} 条`,
+                                        onChange: this.onChange
+                                    }}
+                                    bordered>
                                 </Table>
                             </Spin>
-                            <div style={{ height: 15 }}></div>
-                            <Pagination
-                                pageSizeOptions={[5, 10, 20, 50, 100]}
-                                defaultPageSize={5}
-                                total={this.state.total}
-                                showSizeChanger
-                                showQuickJumper
-                                showTotal={total => `共 ${total} 条`}
-                                onChange={this.onChange}
-                            />
                         </Col>
                     </Row>
                 </Card>
